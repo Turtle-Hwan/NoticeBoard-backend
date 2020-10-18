@@ -47,8 +47,6 @@ http.createServer(function(req, res) {					//http 서버 생성.
 					console.log('********mysql에 입력 완료*******\n' + rows);
 				}
 			});
-
-			
 		});
 
 	}
