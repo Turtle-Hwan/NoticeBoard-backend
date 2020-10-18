@@ -7,11 +7,18 @@
 	
 	<body>
 		<p>
-			게시판입니다
+			게시판
 		</p>
 		
-		<form>
-			입력: <input type = "text" name = "inputData"> <br>
+		<p>
+			회원가입
+		</p>
+
+		<form method = "POST" name = "member_info">
+			닉네임: <input type = "text" name = "inputName"> <br>
+			ID : <input type = "text" name = "inputId"> <br>
+			PW : <input type = "text" name = "inputPw"> <br>
+			<input type = "submit" value = "회원가입 확인" formaction = "/web/main.js">		<!--버튼 눌리면 main.js로 form에 들어온 post 입력값 던져줌.-->
 		</form>
 	</body>
 </html>
