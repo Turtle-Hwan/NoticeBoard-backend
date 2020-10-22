@@ -1,5 +1,6 @@
 # Node.js로 게시판 만들기
 -> mysql과 연동
+
 -> express 사용해 보기
 
 
