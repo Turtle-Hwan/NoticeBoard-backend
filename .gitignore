@@ -1,4 +1,7 @@
 # ignore node_modules directory
 /web/node_modules/
-
 /web_express/node_modules/
+
+# dotenv file
+.env
+.env.test
