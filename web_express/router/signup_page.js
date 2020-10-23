@@ -24,19 +24,14 @@ exports.site_signup_get = function(req, res, next) {
 
 //POST
 exports.site_signup_post = function(err, req, res, next) {
-    res.render("site_signup", {});
-
-    console.log("sdlfjslfadfalkjsldkjalkfj");
-
+    res.render('site_main', {inputName: inputName, inputId: inputId, inputPw: inputPw});
     var {inputName, inputId, inputPw} = req.body;
+
     var member_IDPW = [inputName, inputId, inputPw];
 
-    if (!member_IDPW[0] || !member_IDPW[1] || !member_IDPW[2]) {
-        return res.status(400).send('error');
-    } else {
-        res.json('123');
-        res.render('site_main.html', {inputName: inputName, inputId: inputId, inputPw: inputPw});
-    }
+    res.json('123');
+
+
 
     console.log(member_IDPW);
 

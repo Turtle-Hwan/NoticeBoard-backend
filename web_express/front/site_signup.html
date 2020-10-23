@@ -10,16 +10,37 @@
 			회원가입
 		</p>
 
-		<form action="/signup" method="POST" name = "member_info" >
-			닉네임: <input type = "text" name = "inputName" placeholder="닉네임 입력"> <br>
-			ID : <input type = "text" name = "inputId" placeholder="ID 입력"> <br>
-			PW : <input type = "text" name = "inputPw" placeholder="PW 입력"> <br>
-			<input type = "submit" name = "submit" value = "회원가입 완료">
+		<form action="/signup" method="POST" name = "member_info" onsubmit="handleFormSubmit()">
+			닉네임: <input type = "text" name = "inputName" placeholder="닉네임 입력" onchange="handleValueChange()"> <br>
+			ID : <input type = "text" name = "inputId" placeholder="ID 입력" onchange="handleValueChange()"> <br>
+			PW : <input type = "text" name = "inputPw" placeholder="PW 입력" onchange="handleValueChange()"> <br>
+			<input type = "submit" name = "submit" value = "회원가입 완료" onchange="handleValueChange()"> <br>
 		</form>
 
 
 		<script>
-			var ar = document.getElementById
+			handleFormSubmit = (e) => {
+				e.preventDefault()
+				this.addCustomer()
+					.then((response) => {
+						console.log(response.data);
+					})
+				this.setState({
+					inputName: '',
+					inputId: '',
+					inputPw: '',
+				})
+
+			}
+
+			handleValueChange = (e) => {
+				let nextState = {};
+				nextState[e.target.name] = e.target.value;
+				this.setState(nextState)
+			}
+	
+
+
 		</script>
 
 
