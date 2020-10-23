@@ -10,15 +10,15 @@
 			게시판
 		</p>
 
-        <form method="post" name="signin">
+        <form method="post" name="signin" action="/web_express/main_ex.js">
             ID : <input type = "text" name = "inputId"> <br>
 			PW : <input type = "text" name = "inputPw"> <br>
-            <input type = "submit" value = "로그인" formaction = "main_ex.js">
+            <input type = "submit" value = "로그인">
         </form>
 
 
-		<form method = "get" name = "" >
-            <input type = "submit" value = "회원가입" formaction = "/signup">
+		<form method = "GET" name = "goto_signup_page" action="/signup">
+            <input type = "submit" value = "회원가입">
 		</form>
 	</body>
 </html>

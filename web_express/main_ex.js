@@ -1,58 +1,46 @@
-var express = require('express');
-var app = express()
 
-var fs = require('fs');
+const express = require('express');
+const app = express();
 
-
-app.set('port', (process.env.PORT || 3000));
-
-
-app.get('/', function(req, res) {
-    fs.readFile('./web_express/site_main.html', function(err, data) {
-        if(err) {
-            console.log(err);
-        } else {
-            res.writeHead(200, {'Content-Type' : 'text/html'});
-			res.end(data);
-        }
-    });
-});
+//built-in body-parser
+app.use(express.json());             
+app.use(express.urlencoded( {extended:false} ))
 
 
+const fs = require('fs');
+
+//dotenv
+require('dotenv').config();
+app.set('port', (process.env.SERVER_PORT));
 
 
-app.get("/signup", function(req, res) { 
-    fs.readFile('./web_express/site_signup.html', function(err, data) {
-        if(err) {
-            console.log(err);
-        } else {
-            res.writeHead(200, {'Content-Type' : 'text/html'});
-			res.end(data);
-        }
-    });
-});
-   
-app.post("/signup", function(req, res) {
-    req.on('end', function() {
-        var postData = qs.parse(body);
+//굳이 html을 쓰기 위해...
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+app.set('views', __dirname + '/front');
 
-        var inputData = [postData.inputName, postData.inputId, postData.inputPw];
 
-        console.log(postData);
+//router
+const main_page = require('./router/main_page');
+const signup_page = require('./router/signup_page');
 
 
 
-        sql.db.query('INSERT INTO member (Name, ID, PW) VALUES (?, ?, ?);', inputData, function(err, rows, fields) {
-            if(err) {
-                console.log(err);
-            } else {
-                console.log('********mysql에 입력 완료*******\n' + rows);
-            }
-        });
-    });
-})
+app.get('/', main_page.site_main_get);
+
+app.get('/signup', signup_page.site_signup_get);
+
+app.post('/signup', signup_page.site_signup_post);
 
 
-app.listen(3000, function() {
-    console.log('express server running on port 3000!')
+
+
+
+
+
+
+
+
+app.listen(process.env.SERVER_PORT, function() {
+    console.log('express server running on port ' +  process.env.SERVER_PORT);
 });
