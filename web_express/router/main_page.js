@@ -5,7 +5,7 @@
 //GET
 exports.site_main_get = function(req, res, next) {
 
-    res.render("site_main", {});
+    res.render("site_main");
 
 
     /*  express
@@ -23,6 +23,8 @@ exports.site_main_get = function(req, res, next) {
 
 
 //POST
-
+exports.site_main_post = function(req, res, next) {
+    
+}
 
 

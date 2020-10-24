@@ -11,14 +11,37 @@
 		</p>
 
 		<form action="/signup" method="POST" name = "member_info" onsubmit="handleFormSubmit()">
-			닉네임: <input type = "text" name = "inputName" placeholder="닉네임 입력" onchange="handleValueChange()"> <br>
-			ID : <input type = "text" name = "inputId" placeholder="ID 입력" onchange="handleValueChange()"> <br>
-			PW : <input type = "text" name = "inputPw" placeholder="PW 입력" onchange="handleValueChange()"> <br>
+			닉네임: <input type = "text" name = "userName" placeholder="닉네임 입력" onchange="handleValueChange()"> <br>
+			ID : <input type = "text" name = "userId" placeholder="ID 입력" onchange="handleValueChange()"> <br>
+			PW : <input type = "text" name = "userPw" placeholder="PW 입력" onchange="handleValueChange()"> <br>
 			<button type = "submit" name = "submit" onchange="handleValueChange()"> 회원가입 완료 >  </button> <br>
 		</form>
 
 
-		<script>
+
+
+		<!--아이디 중복 검사(서버) 표시-->
+		<%var idMatch;
+		if (idMatch == 1) {%>
+			<script>alert("이미 존재하는 아이디입니다");</script>
+		<%}%>
+
+
+
+
+
+
+
+		<script type="text/javascript">
+			
+			
+
+			/*
+			** 빈칸검사 넣기
+			** onchange로 반응 만들기 
+			*/
+
+
 			handleFormSubmit = (e) => {
 				e.preventDefault()
 				this.addCustomer()

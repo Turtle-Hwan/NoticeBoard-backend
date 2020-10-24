@@ -11,14 +11,33 @@
 		</p>
 
         <form method="post" name="signin" action="/">
-            ID : <input type = "text" name = "inputId"> <br>
-			PW : <input type = "text" name = "inputPw"> <br>
-            <input type = "submit" value = "로그인">
+            ID : <input type = "text" name = "inputId" placeholder="ID 입력" > <br>
+			PW : <input type = "text" name = "inputPw" placeholder="PW 입력" > <br>
+            <button type = "submit" name = "submit"> 로그인 </button>
         </form>
 
 
 		<form method = "GET" name = "goto_signup_page" action="/signup">
             <input type = "submit" value = "회원가입">
 		</form>
+
+
+
+		<!--회원가입 결과 표시-->
+		<%var idMatch;
+		if (idMatch == 0) {%>
+			<script>alert("회원가입 성공");</script>
+		<%}%>
+
+		<!--로그인 결과 표시-->
+		<%var vaildMember;
+		if (vaildMember == 0) {%>
+			<script>alert("아이디 혹은 비밀번호가 틀렸습니다.");</script>
+		<%}%>
+
+
+
+
+
 	</body>
 </html>
