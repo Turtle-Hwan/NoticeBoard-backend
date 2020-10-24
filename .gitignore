@@ -1,6 +1,7 @@
 # ignore node_modules directory
 ./node_modules
 /node_modules
+/study_Node.js/node_modules/
 
 
 # dotenv file
