@@ -23,7 +23,7 @@ http.createServer(function(req, res) {					//http 서버 생성.
 	
 	//html form 에서 post로 보낸 데이터 받기
 	if(req.method == 'POST') {
-		var body = '';			//너무 많은 데이터가 들어와도 받을 수 있도록
+		var body = '';			
 
 		req.on('data', function(data) {
 			body += data;
@@ -40,7 +40,7 @@ http.createServer(function(req, res) {					//http 서버 생성.
 
 
 
-			sql.db.query('INSERT INTO member (Name, ID, PW) VALUES (?, ?, ?);', inputData, function(err, rows, fields) {
+			sql.db.query('INSERT INTO member (number, Name, ID, PW) VALUES (null, ?, ?, ?);', inputData, function(err, rows, fields) {
 				if(err) {
 					console.log(err);
 				} else {

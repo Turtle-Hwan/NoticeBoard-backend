@@ -8,7 +8,7 @@ exports.site_main_get = function(req, res, next) {
     res.render("site_main", {});
 
 
-    /*  express 덕에 생략가능.
+    /*  express
     fs.readFile('./web_express/front/site_main.html', function(err, data) {
         if(err) {
             console.log(err);

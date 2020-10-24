@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+const sql = require('mysql');
 const express = require('express');
 const app = express();
 
@@ -25,12 +25,68 @@ const main_page = require('./router/main_page');
 const signup_page = require('./router/signup_page');
 
 
+//const db = require('./database/db_login');
+const db = sql.createConnection({
+    host : process.env.DB_HOST,
+    port : process.env.DB_PORT,
+    user : process.env.DB_USER,
+    password : process.env.DB_PASSWORD,
+    database : process.env.DB_DATABASE
+});
+db.connect();
+
+
+
 
 app.get('/', main_page.site_main_get);
 
+app.post('/', function(req, res) {
+    res.send('post req');
+
+});
+
 app.get('/signup', signup_page.site_signup_get);
 
-app.post('/signup', signup_page.site_signup_post);
+
+//
+const qs = require('querystring');
+
+
+app.post('/signup', (req, res) => {
+    res.send("<form action='/signup' method='get' name='redirect_signup'> <button type='submit' name='submit'> 회원가입 완료 </button> </form>");
+
+    var { inputName, inputId, inputPw } = req.body;
+    var inputDatas = [inputName, inputId, inputPw];
+
+     //sql
+    db.query('SELECT * FROM member WHERE ID = ?', inputId, function (err, rows, fields) {
+        if (err) throw console.error();
+
+        for (var i = 0; i < rows.length; i++) {
+            console.log(rows[i]);
+        }
+
+        if (rows.length == 0) {
+
+            db.query('INSERT INTO member (number, Name, ID, PW) VALUES (null, ?, ?, ?);', inputDatas, function (err, rows, fields) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log('********mysql에 입력 완료*******\n' + rows[0]);
+                }
+            });
+        } else {
+            res.json('<script>alert("존재하는 아이디입니다");</script>');
+        }
+
+
+    });
+
+    
+    
+
+
+});
 
 
 
