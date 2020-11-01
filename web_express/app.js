@@ -16,14 +16,12 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 app.set('views', __dirname + '/front');
 
-
-//router
+//router 각각 분리
 const main_page = require('./router/main_page');
 const signup_page = require('./router/signup_page');
 
 
-
-//const db = require('./database/db_login');
+//db 연결
 const db_login = require('./database/db_login');
 
 const db = sql.createConnection(db_login.db_info);
@@ -31,7 +29,7 @@ db.connect();   //각각의 app. 콜백마다 connect 해주면 중복 일어남
 
 
 
-
+//
 //session
 const session = require('express-session');
 const mysqlStore = require('express-mysql-session')(session);
@@ -51,13 +49,13 @@ const saltRounds = 10;
 
 
 
-
 //passport 의 미들웨어는 session 후에 장착해야 함.
-const passport = require('passport')
-    , LocalStrategy = require('passport-local').Strategy;   //어떤 로그인 방식을 취하냐: Strategy
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;   //어떤 로그인 방식을 취하냐: Strategy
 
 
-//passport 미들웨어로 장착.
+
+//passport 미들웨어 장착.
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -110,6 +108,8 @@ passport.use(new LocalStrategy({
 
 
 //  login with passport and compare hash of bcrypt
+app.get('/', main_page.site_main_get);
+
 
 
 
@@ -135,7 +135,7 @@ passport.use('local', new LocalStrategy({
     function(req, userId, userPw, done) {
 
         db.query('SELECT * FROM member WHERE ID = ?;', [userId], function (err, rows) {
-            if (err) { return done(err); }
+            if (err) return done(err);
 
             if (rows.length) {
                 return done(null, false, {message: 'id 중복'});
