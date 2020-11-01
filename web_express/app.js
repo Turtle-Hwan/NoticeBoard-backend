@@ -10,7 +10,6 @@ app.use(express.urlencoded( {extended:false} ))
 require('dotenv').config();
 app.set('port', (process.env.SERVER_PORT));
 
-
 //굳이 html을 쓰기 위해...
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
@@ -19,7 +18,6 @@ app.set('views', __dirname + '/front');
 //router 각각 분리
 const main_page = require('./router/main_page');
 const signup_page = require('./router/signup_page');
-
 
 //db 연결
 const db_login = require('./database/db_login');
@@ -33,26 +31,24 @@ db.connect();   //각각의 app. 콜백마다 connect 해주면 중복 일어남
 //session
 const session = require('express-session');
 const mysqlStore = require('express-mysql-session')(session);
-const sessionStore = new mysqlStore(db_login.db_info);
-
+//mysql session에 연결
 app.use(session({
     secret : process.env.SESSION_SECRET,
     resave : false,
-    saveUninitialized : true,
-    store: sessionStore
+    saveUninitialized : false,
+    store: new mysqlStore(db_login.db_info)
 }))
 
 
+//
 //bcrypt 보안
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 
-
 //passport 의 미들웨어는 session 후에 장착해야 함.
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;   //어떤 로그인 방식을 취하냐: Strategy
-
 
 
 //passport 미들웨어 장착.
