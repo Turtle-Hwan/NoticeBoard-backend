@@ -2,7 +2,7 @@ const sql = require('mysql');
 const express = require('express');
 const app = express();
 
-//built-in body-parser
+//express built-in body-parser
 app.use(express.json());             
 app.use(express.urlencoded( {extended:false} ))
 
@@ -47,6 +47,8 @@ app.use(session({
 
 //bcrypt 보안
 const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 
 
 
@@ -107,8 +109,7 @@ passport.use(new LocalStrategy({
 
 
 
-
-
+//  login with passport and compare hash of bcrypt
 
 
 
