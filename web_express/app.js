@@ -69,6 +69,9 @@ passport.deserializeUser(function(id, done) {
     done(null, id);
 });
 
+//connect-flash
+const flash = require('connect-flash');
+app.use(flash());
 
 
 //passport 사용해서 post 정보 받고, 로그인.
