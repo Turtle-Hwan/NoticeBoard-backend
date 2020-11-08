@@ -28,29 +28,35 @@ db.connect();   //각각의 app. 콜백마다 connect 해주면 중복 일어남
 
 
 //
-//session
+//cookie-parser
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+//session 미들웨어는 cookieparser 필요
 const session = require('express-session');
 const mysqlStore = require('express-mysql-session')(session);
 //mysql session에 연결
 app.use(session({
+    key : 'login-key',
     secret : process.env.SESSION_SECRET,
     resave : false,
-    saveUninitialized : false,
-    store: new mysqlStore(db_login.db_info)
+    saveUninitialized : true,
+    store : new mysqlStore(db_login.db_info),
+    cookie : {
+        maxAge : 1000 * 60 * 60 //쿠키 유효시간 1시간
+    }
 }))
 
 
 //
 //bcrypt 보안
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const salt = 10;
 
 
-//passport 의 미들웨어는 session 후에 장착해야 함.
+//passport 미들웨어는 session 후에 장착해야 함.
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;   //어떤 로그인 방식을 취하냐: Strategy
-
-
 //passport 미들웨어 장착.
 app.use(passport.initialize());
 app.use(passport.session());
@@ -74,11 +80,15 @@ const flash = require('connect-flash');
 app.use(flash());
 
 
+
+
+
 //passport 사용해서 post 정보 받고, 로그인.
 app.post('/', passport.authenticate('local', {
     successRedirect : '/main',
     failureRedirect : '/',
-    failureFlash : true,
+    failureFlash : '인증 실패',
+    successFlash : '인증 성공'
     })
 );
 
@@ -245,8 +255,10 @@ app.get('/main', (req, res) => {
     res.render('site_main_login');
 });
 
+//main 페이지 글쓰기, 파일 올리기
+app.post('/main', (req, res) => {
 
-
+})
 
 //logout page with passport
 app.get('/logout', (req, res) => {
