@@ -1,0 +1,35 @@
+{
+  "name": "study_Node.js",
+  "version": "1.0.0",
+  "description": "-> mysql과 연동",
+  "main": "index.js",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "ejs": "^3.1.5",
+    "dotenv": "^8.2.0",
+    "bcrypt": "^5.0.0",
+    "express-mysql-session": "^2.1.4",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
+    "passport": "^0.4.1",
+    "connect-flash": "^0.1.1",
+    "body-parser": "^1.19.0",
+    "passport-local": "^1.0.0",
+    "express-session": "^1.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Turtle-Hwan/study_Node.js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Turtle-Hwan/study_Node.js/issues"
+  },
+  "homepage": "https://github.com/Turtle-Hwan/study_Node.js#readme"
+}
