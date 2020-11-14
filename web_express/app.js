@@ -32,7 +32,7 @@ db.connect();   //각각의 app. 콜백마다 connect 해주면 중복 일어남
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-//session 미들웨어는 cookieparser 필요
+//session 인증 위해 cookieparser 필요
 const session = require('express-session');
 const mysqlStore = require('express-mysql-session')(session);
 //mysql session에 연결
@@ -64,14 +64,13 @@ app.use(passport.session());
 
 //serializeUser : passport 가 session에 사용자 id 저장하도록 해줌.
 passport.serializeUser(function(user, done) {
+    console.log('id 전달\nserialize \n' + user.id);
     done(null, user.id);
 });
 
 //로그인 성공 후 페이지 방문 시 마다 호출. id를 기준으로 db에서 데이터 검색.
 passport.deserializeUser(function(id, done) {
-    //User.findById(id, function(err, user) {
-    //    done(err, user);
-    //});
+    console.log('deserialize' + id);
     done(null, id);
 });
 
@@ -127,7 +126,7 @@ app.get('/', main_page.site_main_get);
 
 
 
-//  signup with passport and hashing with bcrypt
+//  signup with passport & hashing with bcrypt /회원가입
 app.post('/signup', passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/signup',
@@ -139,6 +138,7 @@ passport.use('local', new LocalStrategy({
         //body 필드에서 값 받아옴.
         usernameField: 'userName', 
         passwordField: 'userPw',
+        session: true,
         passReqToCallback: true
     },
     function(req, username, password, done) {
@@ -146,7 +146,8 @@ passport.use('local', new LocalStrategy({
         db.query('SELECT * FROM member WHERE ID = ?;', [username], function (err, rows) {
             if (err) return done(err);
 
-            if (rows.length) {
+            if (rows.length != 0) {
+                if (err) throw err;
                 return done(null, false, {message: 'id 중복'});
             } else {
                 //비번 해싱.
