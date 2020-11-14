@@ -81,8 +81,6 @@ app.use(flash());
 
 
 
-
-
 //passport 사용해서 post 정보 받고, 로그인.
 app.post('/', passport.authenticate('local', {
     successRedirect : '/main',
@@ -133,29 +131,32 @@ app.get('/', main_page.site_main_get);
 app.post('/signup', passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/signup',
-    failureFlash: true
+    failureFlash: true,
+    successFlash: '회원가입 성공'
 }));
 
 passport.use('local', new LocalStrategy({
-        usernameField: 'userId',
+        //body 필드에서 값 받아옴.
+        usernameField: 'userName', 
         passwordField: 'userPw',
         passReqToCallback: true
     },
-    function(req, userId, userPw, done) {
+    function(req, username, password, done) {
 
-        db.query('SELECT * FROM member WHERE ID = ?;', [userId], function (err, rows) {
+        db.query('SELECT * FROM member WHERE ID = ?;', [username], function (err, rows) {
             if (err) return done(err);
 
             if (rows.length) {
                 return done(null, false, {message: 'id 중복'});
             } else {
                 //비번 해싱.
-                bcrypt.hash(userPw, null, null, function(err, hash) {
-                    var sql = {ID : userId, PW: hash};
+                bcrypt.hash(password, salt, function(err, hash) {
+                    userId = req.body.userId;
+                    var sql = [username, userId, hash];
 
-                    db.query('INSERT INTO member SET ?', sql, function (err, rows) {
+                    db.query('INSERT INTO member(number, Name, ID, PW) VALUES (null, ?, ?, ?)', sql, function (err, rows) {
                         if (err) throw err;
-                        return done(null, {'id' : userId, 'pw' : userPw });
+                        return done(null, {'id' : username, 'pw' : password });
                     });
                 });
             }
@@ -201,7 +202,7 @@ app.get('/signup', signup_page.site_signup_get);
 
 
 /*  <<<signup without passport, bcrypt>>>
-app.post('/signup', (req, res) => {     // 참고: 라우트 응답객체 (res) 는 어떤 분기에도 존재해야 하며, 한 분기에 하나만 존재해야 함!! (send와 redirect 같이 사용 불가.)
+app.post('/signup', (req, res) => {     // 참고: 라우트 응답객체 (res) 는 분기마다 존재해야 하며, 한 분기에 하나만 존재해야 함!! (send와 redirect 같이 사용 불가.)
 
     var { userName, userId, userPw } = req.body;
     var inputDatas = [userName, userId, userPw];
