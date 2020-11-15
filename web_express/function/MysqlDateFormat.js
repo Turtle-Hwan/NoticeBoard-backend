@@ -18,5 +18,5 @@ exports.MysqlDateFormat = function(date) {
     ss = ss >= 10 ? ss : '0' + ss;
 
     
-    return year + '-' + ss + '-' + ss + ' ' + ss + ':' + ss + ':' + ss;
+    return year + '-' + month + '-' + day + ' ' + hh + ':' + mm + ':' + ss;
 }
