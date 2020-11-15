@@ -60,17 +60,21 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-//serializeUser : passport 가 session에 사용자 id 저장하도록 해줌.
+//serializeUser : passport 가 session에 사용자 id 저장하도록 해줌. 
+// 로그인 성공시 done(null, user)의 user 객체를 받아서 req.session.passport.user 에 저장함.
 passport.serializeUser(function(user, done) {
     console.log('serialize, id session에 전달됨, id : ', user.id, ', user : ', user);
-    done(null, user.id);
+    done(null, user);
 });
 
-//로그인 성공 후 페이지 방문 시 마다 호출. id를 기준으로 db에서 데이터 검색.
-passport.deserializeUser(function(id, done) {
-    console.log('deserialize 호출됨, id : ', id);
-    done(null, id);
+//로그인 성공 후 페이지 방문 시 마다 호출 // serializeUser 에 저장된 정보를 콜백 user에 받아서, 실제 DB데이터와 비교
+// 해당 유저 정보가 존재하면 done의 두 번째 인자를 req.user에 저장함.
+passport.deserializeUser(function (user, done) {
+        console.log('deserialize 호출됨, user : ', user);
+
+        done(null, user);
 });
+
 
 //connect-flash
 const flash = require('connect-flash');
@@ -106,9 +110,9 @@ passport.use('login-local', new LocalStrategy({
             } else {    //hash 된 비번 비교
                 bcrypt.compare(password, rows[0].PW, (err, res) => {
                     if (res) {
-                        console.log('로그인 성공')
+                        console.log('로그인 성공, id: ', userid, ', name: ', rows[0].name)
 
-                        return done(null, { id: userid, message: '로그인 성공' });
+                        return done(null, {name: rows[0].name, id: userid, message: '로그인 성공' });
                     } else {
                         return done(null, false, {message: '비밀번호 불일치'})
                     }
@@ -137,7 +141,7 @@ passport.use('signup-local', new LocalStrategy({
         usernameField: 'userName', 
         passwordField: 'userPw',
         session: true,
-        passReqToCallback: true
+        passReqToCallback: true     //콜백에서 req 추가되어 express의 req 객체에 접근 가능.
     },
     function(req, username, password, done) {
         userId = req.body.userId;
@@ -150,17 +154,18 @@ passport.use('signup-local', new LocalStrategy({
                 
                 console.log('회원가입 실패, id 중복')
 
-                return done(null, false, {message: 'id 중복'});
+                //done(무조건 실패하는 경우 err, 성공 시 return 값, 사용자 임의 에러(비밀번호 불일치 등) + 에러 메세지)
+                return done(null, false, {message: 'id 중복'});     
             } else {
                 //비번 해싱.
                 bcrypt.hash(password, salt, null, function(err, hash) {
-                    var sql = [username, userId, hash];
+                    let user_signup = [username, userId, hash];
 
                     console.log('id 다름, 회원가입 성공/// : ', req.session)
                     
-                    db.query('INSERT INTO member(number, Name, ID, PW) VALUES (null, ?, ?, ?)', sql, function (err, rows) {
+                    db.query('INSERT INTO member(No, name, ID, PW) VALUES (null, ?, ?, ?)', user_signup, function (err, rows) {
                         if (err) throw err;
-                        return done(null, {'id' : username, 'pw' : password });
+                        return done(null, {name : username, id : userId });
                     });
                 });
             }
@@ -180,15 +185,41 @@ app.get('/signup', signup_page.site_signup_get);
 
 
 
-//site_main_login
+//site_main_login / 존재하는 글 띄워주기
 app.get('/main', (req, res) => {
-    res.render('site_main_login');
-});
+    db.query('SELECT * FROM writing', (err, rows, fields) => {
 
-//main 페이지 글쓰기, 파일 올리기
+        res.render('site_main_login', { name : req.user.name, rows : rows })
+    })
+})
+
+//main 글 수정, 삭제, 
 app.post('/main', (req, res) => {
 
 })
+
+
+
+
+//글쓰는 페이지
+app.get('/main/write', (req, res) => {
+    res.render('site_main_write')
+})
+
+app.post('/main/write', (req, res) => {
+
+    let write_info = [req.user.name, req.user.id, req.body.writeTitle, req.body.writeText]
+    console.log(write_info)
+
+    db.query('INSERT INTO writing (No, name, id, title, text, writed_datetime, timestamp) VALUES (null, ?, ?, ?, ?, now(), now())', write_info, (err, rows, fields) => {
+        if (err) throw err; 
+
+    })
+    res.redirect('/main')
+})
+
+
+
 
 //logout page with passport
 app.get('/logout', (req, res) => {

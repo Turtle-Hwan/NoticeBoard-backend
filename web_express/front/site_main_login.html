@@ -6,26 +6,32 @@
 	</head>
 	
 	<body>
-		<p>
-			게시판 입니다
-        </p>
+        <p>게시판 입니다</p>
         
-        <form action="/main" method="POST" name="upload">
-            업로드 할 텍스트 입력<br/>
-            <textarea name = 'writeText' rows = '10' cols = '50' wrap = 'virtual'></textarea>
-            
-            <br/>업로드 할 파일 선택<br/>
-            <input type="file" value="파일 선택">
-            <br/>
-            <input type="button" value="확인"><br/><br/>
-        </form>
+        <p><<%=name %>>님 환영합니다</p>
 
 
+        <div>
+            <form action="/logout" method="GET" name="logout">
+                <input type="submit" value="로그아웃">
+            </form>
+        </div>
         
-        <form action="/logout" method="GET" name="logout">
-            <input type="submit" value="로그아웃">
-        </form>
-        
+        <div>
+            <form action="/main/write" method="GET" name="new_write">
+                <input type="submit" value="새글쓰기">
+            </form>
+        </div>
+
+
+
+        <!--글 띄워주기-->
+        <p><%=rows %></p>
+
+
+
+
+
         
     </body>
         
