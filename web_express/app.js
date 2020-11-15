@@ -26,6 +26,10 @@ const db = sql.createConnection(db_login.db_info);
 db.connect();   //각각의 app. 콜백마다 connect 해주면 중복 일어남!!
 
 
+//bcrypt 보안
+const bcrypt = require('bcrypt');
+const salt = 10;
+
 
 //
 //cookie-parser
@@ -35,6 +39,7 @@ app.use(cookieParser());
 //session 인증 위해 cookieparser 필요
 const session = require('express-session');
 const mysqlStore = require('express-mysql-session')(session);
+
 //mysql session에 연결
 app.use(session({
     key : 'login-key',
@@ -47,16 +52,9 @@ app.use(session({
     }
 }))
 
-
-//
-//bcrypt 보안
-const bcrypt = require('bcrypt');
-const salt = 10;
-
-
 //passport 미들웨어는 session 후에 장착해야 함.
 const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;   //어떤 로그인 방식을 취하냐: Strategy
+const LocalStrategy = require('passport-local').Strategy;   //Strategy : 어떤 로그인 방식을 취하냐
 //passport 미들웨어 장착.
 app.use(passport.initialize());
 app.use(passport.session());
@@ -64,13 +62,13 @@ app.use(passport.session());
 
 //serializeUser : passport 가 session에 사용자 id 저장하도록 해줌.
 passport.serializeUser(function(user, done) {
-    console.log('id 전달\nserialize \n' + user.id);
+    console.log('serialize, id session에 전달됨, id : ', user.id, ', user : ', user);
     done(null, user.id);
 });
 
 //로그인 성공 후 페이지 방문 시 마다 호출. id를 기준으로 db에서 데이터 검색.
 passport.deserializeUser(function(id, done) {
-    console.log('deserialize' + id);
+    console.log('deserialize 호출됨, id : ', id);
     done(null, id);
 });
 
@@ -81,60 +79,60 @@ app.use(flash());
 
 
 //passport 사용해서 post 정보 받고, 로그인.
-app.post('/', passport.authenticate('local', {
+app.post('/', passport.authenticate('login-local', {
     successRedirect : '/main',
     failureRedirect : '/',
-    failureFlash : '인증 실패',
-    successFlash : '인증 성공'
+    failureFlash : '로그인 실패',
+    successFlash : '로그인 성공'
     })
 );
 
-passport.use(new LocalStrategy({
-    usernameField : 'inputId',
-    passwordField : 'inputPw',
+passport.use('login-local', new LocalStrategy({
+    usernameField : 'userId',
+    passwordField : 'userPw',
+    session : true,
     passReqToCallback : true
     },
-    function(req, inputId, inputPw, done){     //done 은 인증 성공 시 passport에게 사용자 정보 전달함.
-        db.query('SELECT * FROM member WHERE ID = ? and PW = ?;', [inputId, inputPw], function (err, rows, fields) {
+    function(req, userid, password, done){     //done 은 인증 성공 시 passport에게 사용자 정보 전달함.
+
+        db.query('SELECT * FROM member WHERE ID = ?;', [userid], function (err, rows, fields) {
             if (err) return done(err);
 
-            //id pw 틀리면 login 실패
+            //id 틀리면 login 실패
             if (rows.length == 0) {
-                return done(null, false, {message: '로그인 실패'});
+                console.log('로그인 실패 : 없는 아이디')
 
-            } else {
-                //login 성공.
-                return done(null, {message: '로그인 성공'});
+                return done(null, false, { message: '로그인 실패' });
+            } else {    //hash 된 비번 비교
+                bcrypt.compare(password, rows[0].PW, (err, res) => {
+                    if (res) {
+                        console.log('로그인 성공')
+
+                        return done(null, { id: userid, message: '로그인 성공' });
+                    } else {
+                        return done(null, false, {message: '비밀번호 불일치'})
+                    }
+                })
             }
         });
     })
 );
 
 
-
-
-//  login with passport and compare hash of bcrypt
+// put up a login page 
 app.get('/', main_page.site_main_get);
 
 
 
-
-
-
-
-
-
-
-
 //  signup with passport & hashing with bcrypt /회원가입
-app.post('/signup', passport.authenticate('local', {
+app.post('/signup', passport.authenticate('signup-local', {
     successRedirect: '/',
     failureRedirect: '/signup',
-    failureFlash: true,
+    failureFlash: '회원가입 실패',
     successFlash: '회원가입 성공'
 }));
 
-passport.use('local', new LocalStrategy({
+passport.use('signup-local', new LocalStrategy({
         //body 필드에서 값 받아옴.
         usernameField: 'userName', 
         passwordField: 'userPw',
@@ -142,19 +140,24 @@ passport.use('local', new LocalStrategy({
         passReqToCallback: true
     },
     function(req, username, password, done) {
+        userId = req.body.userId;
 
-        db.query('SELECT * FROM member WHERE ID = ?;', [username], function (err, rows) {
+        db.query('SELECT * FROM member WHERE ID = ?;', [userId], function (err, rows) {
             if (err) return done(err);
 
             if (rows.length != 0) {
                 if (err) throw err;
+                
+                console.log('회원가입 실패, id 중복')
+
                 return done(null, false, {message: 'id 중복'});
             } else {
                 //비번 해싱.
-                bcrypt.hash(password, salt, function(err, hash) {
-                    userId = req.body.userId;
+                bcrypt.hash(password, salt, null, function(err, hash) {
                     var sql = [username, userId, hash];
 
+                    console.log('id 다름, 회원가입 성공/// : ', req.session)
+                    
                     db.query('INSERT INTO member(number, Name, ID, PW) VALUES (null, ?, ?, ?)', sql, function (err, rows) {
                         if (err) throw err;
                         return done(null, {'id' : username, 'pw' : password });
@@ -168,84 +171,9 @@ passport.use('local', new LocalStrategy({
 
 
 
-
-/*  <<<login without passport, bcrypt>>>
-//site_main
-app.get('/', main_page.site_main_get);
-
-
-app.post('/', (req, res) => {
-
-    //site_main id, pw 입력값.
-
-    //sql에 idpw 있는지 검사
-    db.query('SELECT * FROM member WHERE ID = ? and PW = ?;', [req.body.inputId, req.body.inputPw], function (err, rows, fields) {
-        if (err) throw console.log(err);
-
-        //id pw 틀리면 login 실패
-        if (rows.length == 0) {
-            res.render("site_main", { vaildMember : 0 });
-
-        } else {
-            //login 성공.
-            res.render("site_main_login");
-        }
-    });
-});
-*/
-
-
-
 //site_signup
 app.get('/signup', signup_page.site_signup_get);
 
-
-
-
-/*  <<<signup without passport, bcrypt>>>
-app.post('/signup', (req, res) => {     // 참고: 라우트 응답객체 (res) 는 분기마다 존재해야 하며, 한 분기에 하나만 존재해야 함!! (send와 redirect 같이 사용 불가.)
-
-    var { userName, userId, userPw } = req.body;
-    var inputDatas = [userName, userId, userPw];
-
-    
-    //sql에 id가 있는지 검사.
-    db.query('SELECT * FROM member WHERE ID = ?;', userId, function (err, rows, fields) {
-        if (err) throw console.log(err);
-
-        for (var i = 0; i < rows.length; i++)
-            console.log("db에 존재하는 열: \n" + rows[i]);
-
-
-        if (rows.length == 0) {
-            //id 다르면 db에 쓰고 홈 리다이렉트 및 alert
-            res.render("site_main", {idMatch : 0});
-
-            //res.send("<form action='/signup' method='get' name='redirect_signup'> <button type='submit' name='submit'> 회원가입 완료 </button> </form>");
-            
-
-            db.query('INSERT INTO member (number, Name, ID, PW) VALUES (null, ?, ?, ?);', inputDatas, function (err, rows, fields) {
-                if (err) throw console.log(err);
-
-                console.log('********mysql에 입력 완료*******\n' + inputDatas);
-            });
-
-
-        } else {
-            //id 같으면 alert
-            res.render("site_signup", {idMatch : 1});
-
-
-            /* 참고: send 대신 render 사용하면 redirect와 동시에 html로 data 전달 가능.
-            res.send("<form action='/signup' method='get' name='redirect_signup'> </form> <script>alert('이미존재하는 아이디입니다');</script>");
-            */
-
-        /*
-        }
-
-    });
-
-}); */
 
 
 
@@ -267,6 +195,7 @@ app.get('/logout', (req, res) => {
     req.logout();
     req.session.save(function() {   //sessionStore에 데이터 반영 후 redirect => 로그인할 때도 세션 문제 겪으면 같은 처리.
         res.redirect('/');
+        console.log('로그아웃 됨.')
     })
 })
 
