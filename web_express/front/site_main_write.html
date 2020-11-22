@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title> 게시판 </title>
+		<title> 게시판 - 글 쓰기 </title>
 	</head>
 	
 	<body>
@@ -12,16 +12,16 @@
 
 
 		<form action="/main/write" method="POST" name="upload">
-			<br/>업로드 할 글 입력<br/>
-			<br/>글 제목
+			<br>업로드 할 글 입력<br>
+			<br>글 제목<br>
 			<textarea name = 'writeTitle' rows = '2' cols = '50' wrap='virtual'></textarea>
 
-            <br/>글 내용<br/>
+            <br>글 내용<br>
             <textarea name = 'writeText' rows = '10' cols = '50' wrap = 'virtual'></textarea>
             
-            <br/>업로드 할 파일 선택<br/>
+            <br>업로드 할 파일 선택<br>
             <input type="file" value="파일 선택">
-			<br/>
+			<br>
 			
 			<input type="submit" value="확인" >
 		

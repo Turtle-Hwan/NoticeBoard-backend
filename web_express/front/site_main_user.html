@@ -2,13 +2,13 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title> 게시판 </title>
+		<title> 게시판 - 메인 </title>
 	</head>
 	
 	<body>
         <p>게시판 입니다</p>
         
-        <p><<%=name %>>님 환영합니다</p>
+        <p><%=name %>님 환영합니다</p>
 
 
         <div>
@@ -43,7 +43,7 @@
                 <td><%=writed_data.No%></td>
                 <td><%=writed_data.name%></td>
                 <td><%=writed_data.id%></td>
-                <td><a href="/board/read/<%=writed_data.No%>"><%=writed_data.title%></a></td>
+                <td><a href="/main/read/<%=writed_data.No%>"><%=writed_data.title%></a></td>
         
                 <td><%=writed_data.text%></td>
                 <td><%=writed_data.writed_datetime%></td>
