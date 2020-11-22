@@ -26,9 +26,34 @@
 
 
         <!--글 띄워주기-->
-        <p><%=rows %></p>
+        <table border = '1'>
+            <tr>
+                <td>번호</td>
+                <td>작성자 이름</td>
+                <td>작성자 id</td>
+                <td>제목 링크</td>
+                <td>내용</td>
+                <td>등록일</td>
+            </tr>
+            <%
+                for (var i = 0; i < rows.length; i++) {
+                     var writed_data = rows[i];
+            %>
+            <tr>
+                <td><%=writed_data.No%></td>
+                <td><%=writed_data.name%></td>
+                <td><%=writed_data.id%></td>
+                <td><a href="/board/read/<%=writed_data.No%>"><%=writed_data.title%></a></td>
+        
+                <td><%=writed_data.text%></td>
+                <td><%=writed_data.writed_datetime%></td>
 
-
+                <td><input type='submit' value='수정'></td>
+                <td><input type='submit' value='삭제'></td>
+            </tr>
+            <%}%>
+        
+        </table>
 
 
 
