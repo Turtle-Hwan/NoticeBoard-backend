@@ -26,6 +26,14 @@ const db = sql.createConnection(db_login.db_info);
 db.connect();   //각각의 app. 콜백마다 connect 해주면 중복 일어남!!
 
 
+//포트 연결되면 메세지
+app.listen(process.env.SERVER_PORT, function() {
+    console.log('express server running on port ' +  process.env.SERVER_PORT);
+});
+
+
+
+
 //bcrypt 보안
 const bcrypt = require('bcrypt');
 const salt = 10;
@@ -60,6 +68,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
+
 //serializeUser : passport 가 session에 사용자 id 저장하도록 해줌. 
 // 로그인 성공시 done(null, user)의 user 객체를 받아서 req.session.passport.user 에 저장함.
 passport.serializeUser(function(user, done) {
@@ -74,6 +83,7 @@ passport.deserializeUser(function (user, done) {
 
         done(null, user);
 });
+
 
 
 //connect-flash
@@ -106,7 +116,7 @@ passport.use('login-local', new LocalStrategy({
             if (rows.length == 0) {
                 console.log('로그인 실패 : 없는 아이디')
 
-                return done(null, false, { message: '로그인 실패' });
+                return done(null, false, { err_message: '로그인 실패' });
             } else {    //hash 된 비번 비교
                 bcrypt.compare(password, rows[0].PW, (err, res) => {
                     if (res) {
@@ -114,7 +124,7 @@ passport.use('login-local', new LocalStrategy({
 
                         return done(null, {name: rows[0].name, id: userid, message: '로그인 성공' });
                     } else {
-                        return done(null, false, {message: '비밀번호 불일치'})
+                        return done(null, false, { err_message: '비밀번호 불일치'})
                     }
                 })
             }
@@ -185,7 +195,7 @@ app.get('/signup', signup_page.site_signup_get);
 
 
 
-//site_main_login / 존재하는 글 띄워주기
+//site_main_user / 존재하는 글 띄워주기
 app.get('/main', (req, res) => {
     //undefined check  / req.user / 현재 로그인 되어 있는지 확인
     if (!req.user) {
@@ -193,17 +203,15 @@ app.get('/main', (req, res) => {
     } else {
         //글 받아서 띄워주기       
         db.query('SELECT * FROM writing', (err, rows, fields) => {
-            res.render('site_main_login', { name: req.user.name, rows: rows })
+            res.render('site_main_user', { name: req.user.name, rows: rows })
         })
     }
 })
 
-//main 글 수정, 삭제, 
+//main post 
 app.post('/main', (req, res) => {
 
 })
-
-
 
 
 //글쓰는 페이지
@@ -212,18 +220,20 @@ app.get('/main/write', (req, res) => {
 })
 
 app.post('/main/write', (req, res) => {
+    //undefined check  / req.user / 현재 로그인 되어 있는지 확인
+    if (!req.user) {
+        res.redirect('/')
+    } else {
+        let write_info = [req.user.name, req.user.id, req.body.writeTitle, req.body.writeText]
+        console.log(write_info)
 
-    let write_info = [req.user.name, req.user.id, req.body.writeTitle, req.body.writeText]
-    console.log(write_info)
+        db.query('INSERT INTO writing (No, name, id, title, text, writed_datetime, timestamp) VALUES (null, ?, ?, ?, ?, now(), now())', write_info, (err, rows, fields) => {
+            if (err) throw err;
 
-    db.query('INSERT INTO writing (No, name, id, title, text, writed_datetime, timestamp) VALUES (null, ?, ?, ?, ?, now(), now())', write_info, (err, rows, fields) => {
-        if (err) throw err; 
-
-    })
-    res.redirect('/main')
+        })
+        res.redirect('/main')
+    }
 })
-
-
 
 
 //logout page with passport
@@ -237,9 +247,9 @@ app.get('/logout', (req, res) => {
 
 
 
-
-
-
-app.listen(process.env.SERVER_PORT, function() {
-    console.log('express server running on port ' +  process.env.SERVER_PORT);
-});
+//글 읽는 페이지
+app.get('/main/read/:dataNo', (req, res) => {
+    db.query('', [dataNo], (req, res) => {
+        
+    })
+})
