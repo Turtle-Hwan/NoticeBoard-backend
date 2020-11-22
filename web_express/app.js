@@ -187,10 +187,15 @@ app.get('/signup', signup_page.site_signup_get);
 
 //site_main_login / 존재하는 글 띄워주기
 app.get('/main', (req, res) => {
-    db.query('SELECT * FROM writing', (err, rows, fields) => {
-
-        res.render('site_main_login', { name : req.user.name, rows : rows })
-    })
+    //undefined check  / req.user / 현재 로그인 되어 있는지 확인
+    if (!req.user) {
+        res.redirect('/')
+    } else {
+        //글 받아서 띄워주기       
+        db.query('SELECT * FROM writing', (err, rows, fields) => {
+            res.render('site_main_login', { name: req.user.name, rows: rows })
+        })
+    }
 })
 
 //main 글 수정, 삭제, 
