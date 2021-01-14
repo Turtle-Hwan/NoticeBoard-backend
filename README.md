@@ -1,4 +1,5 @@
-# Node.js로 게시판 만들기
+# NoticeBoard backend implementation with Node.js
+
 -> mysql과 연동
 
 -> express 사용해 보기
