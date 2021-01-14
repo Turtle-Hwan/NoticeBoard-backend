@@ -3,7 +3,7 @@
 
 -> express 사용해 보기
 
-공부 내용 정리 노션 페이지 : https://www.notion.so/d9769530f2924e50bf7d14a559e4c16a
+공부 내용 정리 노션 페이지(https://www.notion.so/d9769530f2924e50bf7d14a559e4c16a)
 
 > <**세부목표**>
 > * Node.js 및 javascript의 기본 문법 이해, ECMAscript6 알아보기
