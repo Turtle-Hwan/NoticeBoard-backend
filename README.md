@@ -15,3 +15,17 @@
 > * 글 및 댓글 CRUD (작성, 읽기, 수정, 삭제)
 > * DB(MySQL) 문법 및 활용방법 학습 (programmers 문제풀이, 구글링 등)
 > * 회원정보와 글, 댓글을 효율적으로 매핑시켜 DataBase에 저장할 수 있는 방법들 고민. (계층적 데이터베이스 모델 mysql에서 구현법, 단계별 페이징 성능 개선법, 커버링 인덱스 사용법 등)
+
+
+### <게시판 개요>
+* 메인 화면 - 로그인 페이지
+![login](./img/main_login.png)
+
+* 회원가입 페이지
+![signup](./img/signup.png)
+
+* 로그인 성공 시 메인 화면 (실패 시 로그인 페이지로 redirect)
+![main](./img/main.png)
+
+* 글 작성 페이지
+![write](./img/main_write.png)
