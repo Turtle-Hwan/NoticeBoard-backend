@@ -6,3 +6,6 @@
 
 # dotenv file
 .env
+
+#gitignore
+.gitignore
