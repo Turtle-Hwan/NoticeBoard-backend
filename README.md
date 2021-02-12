@@ -18,14 +18,14 @@
 
 
 ### <게시판 개요>
-* 메인 화면 - 로그인 페이지
+* 메인 화면 - 로그인 페이지   
 ![login](./img/main_login.png)
-
-* 회원가입 페이지
+  
+* 회원가입 페이지   
 ![signup](./img/signup.png)
 
-* 로그인 성공 시 메인 화면 (실패 시 로그인 페이지로 redirect)
+* 로그인 성공 시 메인 화면 (실패 시 로그인 페이지로 redirect)   
 ![main](./img/main.png)
 
-* 글 작성 페이지
+* 글 작성 페이지   
 ![write](./img/main_write.png)
