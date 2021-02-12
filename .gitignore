@@ -8,4 +8,4 @@
 .env
 
 #gitignore
-.gitignore
+/.gitignore
